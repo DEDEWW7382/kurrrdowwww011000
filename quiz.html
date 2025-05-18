@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quiz Kurde</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/Flag_of_Kurdistan.svg/32px-Flag_of_Kurdistan.svg.png">
+  <style>
+    #quiz-container {
+      background: #f9fcff;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      max-width: 600px;
+      margin: auto;
+    }
+    .correct { background-color: #d4edda; border-left: 5px solid #28a745; padding: 10px; }
+    .incorrect { background-color: #f8d7da; border-left: 5px solid #dc3545; padding: 10px; }
+    .option { cursor: pointer; padding: 10px; margin-bottom: 5px; border: 1px solid #ccc; border-radius: 5px; }
+    .option:hover { background-color: #f0f0f0; }
+    #score-board { margin-top: 20px; font-weight: bold; }
+    #restart-btn { margin-top: 20px; display: none; }
+  #progress-bar {
+  height: 10px;
+  background-color: #d9edf7;
+  border-radius: 5px;
+  margin-top: 20px;
+  overflow: hidden;
+}
+#progress {
+  height: 100%;
+  background-color: #4caf50;
+  width: 0%;
+  transition: width 0.5s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  padding-right: 5px;
+  border-radius: 5px;
+}
+.option.selected { background-color: #dceefb; font-weight: bold; transform: scale(1.05); transition: transform 0.2s ease; }
+.big-btn {
+  font-size: 1.3em;
+  padding: 18px 40px;
+  border-radius: 12px;
+  background: #1a7f37;
+  color: #fff;
+  border: none;
+  margin: 20px auto 0 auto;
+  display: block;
+  font-weight: bold;
+  box-shadow: 0 2px 8px #0001;
+  transition: background 0.2s, transform 0.1s;
+  cursor: pointer;
+}
+.big-btn:hover, .lang-btn.selected, .cat-btn.selected {
+  background: #145c28;
+  transform: scale(1.05);
+}
+.lang-btn, .cat-btn {
+  font-size: 1.1em;
+  padding: 16px 32px;
+  border-radius: 10px;
+  background: #e6f7ff;
+  color: #1a3a7f;
+  border: 2px solid #1a3a7f;
+  margin: 0 10px 10px 0;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, transform 0.1s;
+}
+.lang-btn.selected, .cat-btn.selected {
+  background: #1a3a7f;
+  color: #fff;
+}
+@media (max-width: 600px) {
+  .big-btn, .lang-btn, .cat-btn { width: 100%; min-width: 0; }
+  #categorie-choices { flex-direction: column; align-items: center; }
+}
+</style>
+<audio id="sound-correct" src="https://cdn.pixabay.com/audio/2021/08/04/audio_62bfe452a0.mp3"></audio>
+<audio id="sound-wrong" src="https://cdn.pixabay.com/audio/2022/03/24/audio_3bfb3cb0aa.mp3"></audio>
+<style>
+.fade-in {
+  animation: fadeIn 0.6s ease-in;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+<body>
+  <header style="background:#b8001c;">
+    <h1><img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau kurde" style="height:40px;vertical-align:middle;margin-right:10px;">Les Kurdes : Histoire, Culture et Langues</h1>
+    <nav>
+      <a id="nav-history" href="index.html">Histoire</a>
+      <a href="groupes.html">Groupes Kurdes</a>
+      <a href="langues.html">Langues</a>
+      <a href="apprendre.html">Apprendre</a>
+      <a href="quiz.html" class="active">Quiz</a>
+      <a id="nav-about" href="a-propos.html">À propos de moi</a>
+    </nav>
+  </header>
+  <main>
+    <section id="quiz">
+      <h2>Quiz interactif : Testez vos connaissances en kurde</h2>
+      <div id="quiz-container">
+        <!-- Écran d'accueil -->
+        <div id="screen-home">
+          <button id="btn-begin" class="big-btn">Commencer</button>
+        </div>
+        <!-- Écran choix langue -->
+        <div id="screen-langue" style="display:none;">
+          <h3>Choisissez la langue</h3>
+          <div style="display:flex;gap:20px;justify-content:center;margin:30px 0;">
+            <button class="lang-btn big-btn" data-lang="kurmanji">Kurmanji</button>
+            <button class="lang-btn big-btn" data-lang="zazaki">Zazaki</button>
+          </div>
+          <button id="btn-lang-next" class="big-btn" style="display:none;">Suivant</button>
+        </div>
+        <!-- Écran choix catégorie -->
+        <div id="screen-categorie" style="display:none;">
+          <h3>Choisissez la catégorie</h3>
+          <div id="categorie-choices" style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;margin:30px 0;"></div>
+          <button id="btn-cat-next" class="big-btn" style="display:none;">Démarrer le quiz</button>
+        </div>
+        <!-- Écran quiz -->
+        <div id="screen-quiz" style="display:none;">
+          <div id="progress-bar"><div id="progress"></div></div>
+          <div id="quiz-progress" style="margin:10px 0 10px 0;font-weight:bold;"></div>
+          <div id="quiz-question" style="margin-top:20px;font-weight:bold;"></div>
+          <div id="quiz-answers"></div>
+          <div id="quiz-result" style="margin-top:20px;font-weight:bold;"></div>
+          <div id="score-board"></div>
+          <div id="feedback" style="margin-top:15px;font-size:1.1em;"></div>
+        </div>
+        <!-- Écran fin -->
+        <div id="screen-end" style="display:none;text-align:center;">
+          <div id="end-result" style="font-size:1.3em;margin:20px 0;"></div>
+          <button id="btn-restart" class="big-btn">Recommencer</button>
+        </div>
+      </div>
+    </section>
+  </main>
+  <footer style="background:#b8001c; color:white;">
+    <p>2025 - Tous droits réservés</p>
+  </footer>
+  <script src="assets/js/chatbot.js"></script>
+  <script>
+    // Définition brute des questions (échantillon, structure extensible)
+    const rawQuestions = {
+      kurmanji: {
+        vocabulaire: [
+          { type: 'qcm', question: "Comment dit-on 'pomme' ?", options: ["Sêv", "Kitêb", "Çay"], answer: "Sêv" },
+          { type: 'qcm', question: "Que signifie 'mal' ?", options: ["Maison", "Chien", "Livre"], answer: "Maison" },
+          { type: 'qcm', question: "Comment dit-on 'eau' ?", options: ["Av", "Nan", "Çay"], answer: "Av" },
+          { type: 'qcm', question: "Comment dit-on 'pain' ?", options: ["Nan", "Sêv", "Çay"], answer: "Nan" },
+          { type: 'qcm', question: "Que signifie 'kitêb' ?", options: ["Livre", "Pomme", "Maison"], answer: "Livre" },
+          { type: 'qcm', question: "Comment dit-on 'fromage' ?", options: ["Penîr", "Çay", "Sêv"], answer: "Penîr" },
+          { type: 'qcm', question: "Que signifie 'çay' ?", options: ["Thé", "Pain", "Eau"], answer: "Thé" },
+          { type: 'qcm', question: "Comment dit-on 'chat' ?", options: ["Pisîk", "Kûçik", "Çay"], answer: "Pisîk" },
+          { type: 'qcm', question: "Que signifie 'kûçik' ?", options: ["Chien", "Chat", "Livre"], answer: "Chien" },
+          { type: 'qcm', question: "Comment dit-on 'fleur' ?", options: ["Gul", "Sêv", "Çay"], answer: "Gul" },
+          { type: 'qcm', question: "Que signifie 'çiya' ?", options: ["Montagne", "Rivière", "Maison"], answer: "Montagne" },
+          { type: 'qcm', question: "Comment dit-on 'soleil' ?", options: ["Tav", "Av", "Nan"], answer: "Tav" },
+          { type: 'qcm', question: "Que signifie 'berf' ?", options: ["Neige", "Vent", "Fleur"], answer: "Neige" },
+          { type: 'qcm', question: "Comment dit-on 'vent' ?", options: ["Ba", "Berf", "Çay"], answer: "Ba" },
+          { type: 'qcm', question: "Que signifie 'dil' ?", options: ["Cœur", "Main", "Tête"], answer: "Cœur" },
+          { type: 'qcm', question: "Comment dit-on 'main' ?", options: ["Dest", "Dil", "Çav"], answer: "Dest" },
+          { type: 'qcm', question: "Que signifie 'çav' ?", options: ["Œil", "Main", "Pied"], answer: "Œil" },
+          { type: 'qcm', question: "Comment dit-on 'pied' ?", options: ["Ling", "Çav", "Dest"], answer: "Ling" },
+          { type: 'qcm', question: "Que signifie 'por' ?", options: ["Cheveux", "Tête", "Main"], answer: "Cheveux" },
+          { type: 'qcm', question: "Comment dit-on 'tête' ?", options: ["Ser", "Por", "Ling"], answer: "Ser" },
+          { type: 'qcm', question: "Que signifie 'masê' ?", options: ["Table", "Chaise", "Porte"], answer: "Table" },
+          { type: 'qcm', question: "Comment dit-on 'chaise' ?", options: ["Kursî", "Masê", "Derî"], answer: "Kursî" },
+          { type: 'qcm', question: "Que signifie 'derî' ?", options: ["Porte", "Fenêtre", "Chaise"], answer: "Porte" },
+          { type: 'qcm', question: "Comment dit-on 'fenêtre' ?", options: ["Pencere", "Derî", "Masê"], answer: "Pencere" },
+          { type: 'qcm', question: "Que signifie 'bazirgân' ?", options: ["Commerçant", "Professeur", "Médecin"], answer: "Commerçant" },
+          { type: 'qcm', question: "Comment dit-on 'professeur' ?", options: ["Mamoste", "Bijîşk", "Bazirgân"], answer: "Mamoste" },
+          { type: 'qcm', question: "Que signifie 'bijîşk' ?", options: ["Médecin", "Ouvrier", "Professeur"], answer: "Médecin" },
+          { type: 'qcm', question: "Comment dit-on 'ouvrier' ?", options: ["Karker", "Bijîşk", "Mamoste"], answer: "Karker" },
+          { type: 'qcm', question: "Que signifie 'jotkar' ?", options: ["Paysan", "Ouvrier", "Commerçant"], answer: "Paysan" },
+          { type: 'qcm', question: "Comment dit-on 'fruit' ?", options: ["Fêkî", "Sebze", "Nan"], answer: "Fêkî" },
+          { type: 'qcm', question: "Que signifie 'sebze' ?", options: ["Légume", "Fruit", "Pain"], answer: "Légume" }
+        ],
+        phrases: [
+          { type: 'phrase', question: "Reconstituez : Je t'aime", phrase: "Ez hej te dikim", words: ["Ez", "hej", "te", "dikim"] },
+          { type: 'qcm', question: "Comment dit-on 'Comment vas-tu ?' ?", options: ["Tu çawa yî ?", "Ez baş im", "Ez dixwim"], answer: "Tu çawa yî ?" },
+          { type: 'phrase', question: "Reconstituez : Je vais bien", phrase: "Ez baş im", words: ["Ez", "baş", "im"] },
+          { type: 'phrase', question: "Reconstituez : Je mange du pain", phrase: "Ez nanê dixwim", words: ["Ez", "nanê", "dixwim"] },
+          { type: 'phrase', question: "Reconstituez : Où est la maison ?", phrase: "Mal li ku ye ?", words: ["Mal", "li", "ku", "ye", "?"] },
+          { type: 'phrase', question: "Reconstituez : Merci beaucoup !", phrase: "Supas gelek !", words: ["Supas", "gelek", "!"] },
+          { type: 'phrase', question: "Reconstituez : Le professeur parle avec l'élève", phrase: "Mamoste bi xwendekar re diaxivê", words: ["Mamoste", "bi", "xwendekar", "re", "diaxivê"] },
+          { type: 'phrase', question: "Reconstituez : La montagne est belle", phrase: "Çiya bedew e", words: ["Çiya", "bedew", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je veux apprendre le kurde", phrase: "Ez dixwazim kurdî fêr bibim", words: ["Ez", "dixwazim", "kurdî", "fêr", "bibim"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes heureux", phrase: "Em beşdar in", words: ["Em", "beşdar", "in"] },
+          { type: 'phrase', question: "Reconstituez : Je ne comprends pas", phrase: "Ez fêm nakim", words: ["Ez", "fêm", "nakim"] },
+          { type: 'phrase', question: "Reconstituez : Tu parles kurde ?", phrase: "Tu kurdî diaxivî ?", words: ["Tu", "kurdî", "diaxivî", "?"] },
+          { type: 'phrase', question: "Reconstituez : Il lit un livre", phrase: "Ew kitêbek dixwîne", words: ["Ew", "kitêbek", "dixwîne"] },
+          { type: 'phrase', question: "Reconstituez : Nous allons à l'école", phrase: "Em diçin dibistanê", words: ["Em", "diçin", "dibistanê"] },
+          { type: 'phrase', question: "Reconstituez : Je veux boire du thé", phrase: "Ez dixwazim çay vexwim", words: ["Ez", "dixwazim", "çay", "vexwim"] },
+          { type: 'phrase', question: "Reconstituez : Il fait froid aujourd'hui", phrase: "Îro sar e", words: ["Îro", "sar", "e"] },
+          { type: 'phrase', question: "Reconstituez : C'est facile", phrase: "Ev hêsan e", words: ["Ev", "hêsan", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je suis fatigué", phrase: "Ez westiyayî me", words: ["Ez", "westiyayî", "me"] },
+          { type: 'phrase', question: "Reconstituez : Il est médecin", phrase: "Ew bijîşk e", words: ["Ew", "bijîşk", "e"] },
+          { type: 'phrase', question: "Reconstituez : Nous habitons à Diyarbakir", phrase: "Em li Amedê dijîn", words: ["Em", "li", "Amedê", "dijîn"] },
+          { type: 'phrase', question: "Reconstituez : Je veux aller au marché", phrase: "Ez dixwazim bazarê biçim", words: ["Ez", "dixwazim", "bazarê", "biçim"] },
+          { type: 'phrase', question: "Reconstituez : Il fait beau", phrase: "Hava baş e", words: ["Hava", "baş", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je suis étudiant", phrase: "Ez xwendekar im", words: ["Ez", "xwendekar", "im"] },
+          { type: 'phrase', question: "Reconstituez : Tu es professeur", phrase: "Tu mamoste yî", words: ["Tu", "mamoste", "yî"] },
+          { type: 'phrase', question: "Reconstituez : Il est commerçant", phrase: "Ew bazirgân e", words: ["Ew", "bazirgân", "e"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes amis", phrase: "Em heval in", words: ["Em", "heval", "in"] },
+          { type: 'phrase', question: "Reconstituez : Je suis content", phrase: "Ez kêfxweş im", words: ["Ez", "kêfxweş", "im"] },
+          { type: 'phrase', question: "Reconstituez : Tu es triste", phrase: "Tu xemgîn yî", words: ["Tu", "xemgîn", "yî"] },
+          { type: 'phrase', question: "Reconstituez : Il est fatigué", phrase: "Ew westiyayî ye", words: ["Ew", "westiyayî", "ye"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes en vacances", phrase: "Em di pêşveçûnê ne", words: ["Em", "di", "pêşveçûnê", "ne"] }
+        ],
+        conjugaisons: [
+          { type: 'qcm', question: "Conjuguez 'être' à la 1ère personne du singulier (présent)", options: ["Ez im", "Ez in", "Ez î"], answer: "Ez im" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 2ème personne du singulier (présent)", options: ["Te heye", "Ez heye", "Em heye"], answer: "Te heye" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 3ème personne du singulier (présent)", options: ["Ew dike", "Ew dikim", "Ew dikî"], answer: "Ew dike" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 1ère personne du pluriel (présent)", options: ["Em diçin", "Em diçim", "Em diçe"], answer: "Em diçin" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 2ème personne du singulier (présent)", options: ["Tu têyî", "Tu tê", "Tu têne"], answer: "Tu têyî" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 1ère personne du singulier (présent)", options: ["Ez dibêjim", "Ez dibêjî", "Ez dibêje"], answer: "Ez dibêjim" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 2ème personne du pluriel (présent)", options: ["Hûn dibînin", "Hûn dibînim", "Hûn dibîna"], answer: "Hûn dibînin" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 1ère personne du singulier (présent)", options: ["Ez dikarim", "Ez dikarî", "Ez dikare"], answer: "Ez dikarim" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 3ème personne du pluriel (présent)", options: ["Ewan divê", "Ewan divin", "Ewan dive"], answer: "Ewan divê" },
+          { type: 'qcm', question: "Conjuguez 'être' à la 2ème personne du singulier (passé)", options: ["Tu bûyî", "Tu bû", "Tu bûm"], answer: "Tu bûyî" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 1ère personne du pluriel (passé)", options: ["Em hebûn", "Em hebûm", "Em hebûyî"], answer: "Em hebûn" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 2ème personne du singulier (passé)", options: ["Tu kirî", "Tu kirim", "Tu kiri"], answer: "Tu kirî" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 3ème personne du singulier (passé)", options: ["Ew çû", "Ew çûm", "Ew çûyî"], answer: "Ew çû" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 1ère personne du singulier (passé)", options: ["Ez hatim", "Ez hatî", "Ez hat"], answer: "Ez hatim" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 2ème personne du pluriel (passé)", options: ["Hûn gotin", "Hûn got", "Hûn gotî"], answer: "Hûn gotin" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 3ème personne du pluriel (passé)", options: ["Ewan dîtin", "Ewan dît", "Ewan dîtî"], answer: "Ewan dîtin" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 2ème personne du singulier (passé)", options: ["Tu dikarî", "Tu dikarîyî", "Tu dikarîye"], answer: "Tu dikarî" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 1ère personne du singulier (passé)", options: ["Ez divê bûm", "Ez divê bû", "Ez divê bûyî"], answer: "Ez divê bûm" },
+          { type: 'qcm', question: "Conjuguez 'être' à la 3ème personne du pluriel (futur)", options: ["Ewan dê bin", "Ewan dê bibe", "Ewan dê bibe"], answer: "Ewan dê bin" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 2ème personne du pluriel (futur)", options: ["Hûn dê hebe", "Hûn dê hebin", "Hûn dê hebî"], answer: "Hûn dê hebe" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 1ère personne du singulier (futur)", options: ["Ez dê bikim", "Ez dê bikî", "Ez dê bike"], answer: "Ez dê bikim" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 2ème personne du singulier (futur)", options: ["Tu dê biçî", "Tu dê biçim", "Tu dê biçe"], answer: "Tu dê biçî" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 3ème personne du singulier (futur)", options: ["Ew dê bê", "Ew dê bêje", "Ew dê bê"], answer: "Ew dê bê" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 1ère personne du pluriel (futur)", options: ["Em dê bibêjin", "Em dê bibêjî", "Em dê bibêje"], answer: "Em dê bibêjin" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 2ème personne du singulier (futur)", options: ["Tu dê bibînî", "Tu dê bibînim", "Tu dê bibîne"], answer: "Tu dê bibînî" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 3ème personne du pluriel (futur)", options: ["Ewan dê bikarin", "Ewan dê bikarî", "Ewan dê bikare"], answer: "Ewan dê bikarin" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 2ème personne du singulier (futur)", options: ["Tu dê divê", "Tu dê dive", "Tu dê divin"], answer: "Tu dê divê" }
+        ]
+      },
+      zazaki: {
+        vocabulaire: [
+          { type: 'qcm', question: "Comment dit-on 'pomme' ?", options: ["Sêv", "Kitêb", "Çay"], answer: "Sêv" },
+          { type: 'qcm', question: "Que signifie 'mal' ?", options: ["Maison", "Chien", "Livre"], answer: "Maison" },
+          { type: 'qcm', question: "Comment dit-on 'eau' ?", options: ["Av", "Nan", "Çay"], answer: "Av" },
+          { type: 'qcm', question: "Comment dit-on 'pain' ?", options: ["Nan", "Sêv", "Çay"], answer: "Nan" },
+          { type: 'qcm', question: "Que signifie 'kitêb' ?", options: ["Livre", "Pomme", "Maison"], answer: "Livre" },
+          { type: 'qcm', question: "Comment dit-on 'fromage' ?", options: ["Penîr", "Çay", "Sêv"], answer: "Penîr" },
+          { type: 'qcm', question: "Que signifie 'çay' ?", options: ["Thé", "Pain", "Eau"], answer: "Thé" },
+          { type: 'qcm', question: "Comment dit-on 'chat' ?", options: ["Pisîk", "Kûçik", "Çay"], answer: "Pisîk" },
+          { type: 'qcm', question: "Que signifie 'kûçik' ?", options: ["Chien", "Chat", "Livre"], answer: "Chien" },
+          { type: 'qcm', question: "Comment dit-on 'fleur' ?", options: ["Gul", "Sêv", "Çay"], answer: "Gul" },
+          { type: 'qcm', question: "Que signifie 'çiya' ?", options: ["Montagne", "Rivière", "Maison"], answer: "Montagne" },
+          { type: 'qcm', question: "Comment dit-on 'soleil' ?", options: ["Tav", "Av", "Nan"], answer: "Tav" },
+          { type: 'qcm', question: "Que signifie 'berf' ?", options: ["Neige", "Vent", "Fleur"], answer: "Neige" },
+          { type: 'qcm', question: "Comment dit-on 'vent' ?", options: ["Ba", "Berf", "Çay"], answer: "Ba" },
+          { type: 'qcm', question: "Que signifie 'dil' ?", options: ["Cœur", "Main", "Tête"], answer: "Cœur" },
+          { type: 'qcm', question: "Comment dit-on 'main' ?", options: ["Dest", "Dil", "Çav"], answer: "Dest" },
+          { type: 'qcm', question: "Que signifie 'çav' ?", options: ["Œil", "Main", "Pied"], answer: "Œil" },
+          { type: 'qcm', question: "Comment dit-on 'pied' ?", options: ["Ling", "Çav", "Dest"], answer: "Ling" },
+          { type: 'qcm', question: "Que signifie 'por' ?", options: ["Cheveux", "Tête", "Main"], answer: "Cheveux" },
+          { type: 'qcm', question: "Comment dit-on 'tête' ?", options: ["Ser", "Por", "Ling"], answer: "Ser" },
+          { type: 'qcm', question: "Que signifie 'masê' ?", options: ["Table", "Chaise", "Porte"], answer: "Table" },
+          { type: 'qcm', question: "Comment dit-on 'chaise' ?", options: ["Kursî", "Masê", "Derî"], answer: "Kursî" },
+          { type: 'qcm', question: "Que signifie 'derî' ?", options: ["Porte", "Fenêtre", "Chaise"], answer: "Porte" },
+          { type: 'qcm', question: "Comment dit-on 'fenêtre' ?", options: ["Pencere", "Derî", "Masê"], answer: "Pencere" },
+          { type: 'qcm', question: "Que signifie 'bazirgân' ?", options: ["Commerçant", "Professeur", "Médecin"], answer: "Commerçant" },
+          { type: 'qcm', question: "Comment dit-on 'professeur' ?", options: ["Mamoste", "Bijîşk", "Bazirgân"], answer: "Mamoste" },
+          { type: 'qcm', question: "Que signifie 'bijîşk' ?", options: ["Médecin", "Ouvrier", "Professeur"], answer: "Médecin" },
+          { type: 'qcm', question: "Comment dit-on 'ouvrier' ?", options: ["Karker", "Bijîşk", "Mamoste"], answer: "Karker" },
+          { type: 'qcm', question: "Que signifie 'jotkar' ?", options: ["Paysan", "Ouvrier", "Commerçant"], answer: "Paysan" },
+          { type: 'qcm', question: "Comment dit-on 'fruit' ?", options: ["Fêkî", "Sebze", "Nan"], answer: "Fêkî" },
+          { type: 'qcm', question: "Que signifie 'sebze' ?", options: ["Légume", "Fruit", "Pain"], answer: "Légume" }
+        ],
+        phrases: [
+          { type: 'phrase', question: "Reconstituez : Je t'aime", phrase: "Ez şıma hez dıkım", words: ["Ez", "şıma", "hez", "dıkım"] },
+          { type: 'qcm', question: "Comment dit-on 'Comment vas-tu ?' ?", options: ["Tu çı wayî ?", "Ez baş im", "Ez xwarim"], answer: "Tu çı wayî ?" },
+          { type: 'phrase', question: "Reconstituez : Je vais bien", phrase: "Ez baş im", words: ["Ez", "baş", "im"] },
+          { type: 'phrase', question: "Reconstituez : Je mange du pain", phrase: "Ez nanê dixwim", words: ["Ez", "nanê", "dixwim"] },
+          { type: 'phrase', question: "Reconstituez : Où est la maison ?", phrase: "Mal li ku ye ?", words: ["Mal", "li", "ku", "ye", "?"] },
+          { type: 'phrase', question: "Reconstituez : Merci beaucoup !", phrase: "Supas gelek !", words: ["Supas", "gelek", "!"] },
+          { type: 'phrase', question: "Reconstituez : Le professeur parle avec l'élève", phrase: "Mamoste bi xwendekar re diaxivê", words: ["Mamoste", "bi", "xwendekar", "re", "diaxivê"] },
+          { type: 'phrase', question: "Reconstituez : La montagne est belle", phrase: "Çiya bedew e", words: ["Çiya", "bedew", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je veux apprendre le kurde", phrase: "Ez dixwazim kurdî fêr bibim", words: ["Ez", "dixwazim", "kurdî", "fêr", "bibim"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes heureux", phrase: "Em beşdar in", words: ["Em", "beşdar", "in"] },
+          { type: 'phrase', question: "Reconstituez : Je ne comprends pas", phrase: "Ez fêm nakim", words: ["Ez", "fêm", "nakim"] },
+          { type: 'phrase', question: "Reconstituez : Tu parles kurde ?", phrase: "Tu kurdî diaxivî ?", words: ["Tu", "kurdî", "diaxivî", "?"] },
+          { type: 'phrase', question: "Reconstituez : Il lit un livre", phrase: "Ew kitêbek dixwîne", words: ["Ew", "kitêbek", "dixwîne"] },
+          { type: 'phrase', question: "Reconstituez : Nous allons à l'école", phrase: "Em diçin dibistanê", words: ["Em", "diçin", "dibistanê"] },
+          { type: 'phrase', question: "Reconstituez : Je veux boire du thé", phrase: "Ez dixwazim çay vexwim", words: ["Ez", "dixwazim", "çay", "vexwim"] },
+          { type: 'phrase', question: "Reconstituez : Il fait froid aujourd'hui", phrase: "Îro sar e", words: ["Îro", "sar", "e"] },
+          { type: 'phrase', question: "Reconstituez : C'est facile", phrase: "Ev hêsan e", words: ["Ev", "hêsan", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je suis fatigué", phrase: "Ez westiyayî me", words: ["Ez", "westiyayî", "me"] },
+          { type: 'phrase', question: "Reconstituez : Il est médecin", phrase: "Ew bijîşk e", words: ["Ew", "bijîşk", "e"] },
+          { type: 'phrase', question: "Reconstituez : Nous habitons à Diyarbakir", phrase: "Em li Amedê dijîn", words: ["Em", "li", "Amedê", "dijîn"] },
+          { type: 'phrase', question: "Reconstituez : Je veux aller au marché", phrase: "Ez dixwazim bazarê biçim", words: ["Ez", "dixwazim", "bazarê", "biçim"] },
+          { type: 'phrase', question: "Reconstituez : Il fait beau", phrase: "Hava baş e", words: ["Hava", "baş", "e"] },
+          { type: 'phrase', question: "Reconstituez : Je suis étudiant", phrase: "Ez xwendekar im", words: ["Ez", "xwendekar", "im"] },
+          { type: 'phrase', question: "Reconstituez : Tu es professeur", phrase: "Tu mamoste yî", words: ["Tu", "mamoste", "yî"] },
+          { type: 'phrase', question: "Reconstituez : Il est commerçant", phrase: "Ew bazirgân e", words: ["Ew", "bazirgân", "e"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes amis", phrase: "Em heval in", words: ["Em", "heval", "in"] },
+          { type: 'phrase', question: "Reconstituez : Je suis content", phrase: "Ez kêfxweş im", words: ["Ez", "kêfxweş", "im"] },
+          { type: 'phrase', question: "Reconstituez : Tu es triste", phrase: "Tu xemgîn yî", words: ["Tu", "xemgîn", "yî"] },
+          { type: 'phrase', question: "Reconstituez : Il est fatigué", phrase: "Ew westiyayî ye", words: ["Ew", "westiyayî", "ye"] },
+          { type: 'phrase', question: "Reconstituez : Nous sommes en vacances", phrase: "Em di pêşveçûnê ne", words: ["Em", "di", "pêşveçûnê", "ne"] }
+        ],
+        conjugaisons: [
+          { type: 'qcm', question: "Conjuguez 'être' à la 1ère personne du singulier (présent)", options: ["Ez im", "Ez in", "Ez î"], answer: "Ez im" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 2ème personne du singulier (présent)", options: ["Te estê", "Ez estê", "Em estê"], answer: "Te estê" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 3ème personne du singulier (présent)", options: ["Ew dike", "Ew dikim", "Ew dikî"], answer: "Ew dike" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 1ère personne du pluriel (présent)", options: ["Em diçin", "Em diçim", "Em diçe"], answer: "Em diçin" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 2ème personne du singulier (présent)", options: ["Tu têyî", "Tu tê", "Tu têne"], answer: "Tu têyî" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 1ère personne du singulier (présent)", options: ["Ez dibêjim", "Ez dibêjî", "Ez dibêje"], answer: "Ez dibêjim" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 2ème personne du pluriel (présent)", options: ["Hûn dibînin", "Hûn dibînim", "Hûn dibîna"], answer: "Hûn dibînin" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 1ère personne du singulier (présent)", options: ["Ez dikarim", "Ez dikarî", "Ez dikare"], answer: "Ez dikarim" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 3ème personne du pluriel (présent)", options: ["Ewan divê", "Ewan divin", "Ewan dive"], answer: "Ewan divê" },
+          { type: 'qcm', question: "Conjuguez 'être' à la 2ème personne du singulier (passé)", options: ["Tu bûyî", "Tu bû", "Tu bûm"], answer: "Tu bûyî" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 1ère personne du pluriel (passé)", options: ["Em hebûn", "Em hebûm", "Em hebûyî"], answer: "Em hebûn" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 2ème personne du singulier (passé)", options: ["Tu kirî", "Tu kirim", "Tu kiri"], answer: "Tu kirî" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 3ème personne du singulier (passé)", options: ["Ew çû", "Ew çûm", "Ew çûyî"], answer: "Ew çû" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 1ère personne du singulier (passé)", options: ["Ez hatim", "Ez hatî", "Ez hat"], answer: "Ez hatim" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 2ème personne du pluriel (passé)", options: ["Hûn gotin", "Hûn got", "Hûn gotî"], answer: "Hûn gotin" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 3ème personne du pluriel (passé)", options: ["Ewan dîtin", "Ewan dît", "Ewan dîtî"], answer: "Ewan dîtin" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 2ème personne du singulier (passé)", options: ["Tu dikarî", "Tu dikarîyî", "Tu dikarîye"], answer: "Tu dikarî" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 1ère personne du singulier (passé)", options: ["Ez divê bûm", "Ez divê bû", "Ez divê bûyî"], answer: "Ez divê bûm" },
+          { type: 'qcm', question: "Conjuguez 'être' à la 3ème personne du pluriel (futur)", options: ["Ewan dê bin", "Ewan dê bibe", "Ewan dê bibe"], answer: "Ewan dê bin" },
+          { type: 'qcm', question: "Conjuguez 'avoir' à la 2ème personne du pluriel (futur)", options: ["Hûn dê hebe", "Hûn dê hebin", "Hûn dê hebî"], answer: "Hûn dê hebe" },
+          { type: 'qcm', question: "Conjuguez 'faire' à la 1ère personne du singulier (futur)", options: ["Ez dê bikim", "Ez dê bikî", "Ez dê bike"], answer: "Ez dê bikim" },
+          { type: 'qcm', question: "Conjuguez 'aller' à la 2ème personne du singulier (futur)", options: ["Tu dê biçî", "Tu dê biçim", "Tu dê biçe"], answer: "Tu dê biçî" },
+          { type: 'qcm', question: "Conjuguez 'venir' à la 3ème personne du singulier (futur)", options: ["Ew dê bê", "Ew dê bêje", "Ew dê bê"], answer: "Ew dê bê" },
+          { type: 'qcm', question: "Conjuguez 'dire' à la 1ère personne du pluriel (futur)", options: ["Em dê bibêjin", "Em dê bibêjî", "Em dê bibêje"], answer: "Em dê bibêjin" },
+          { type: 'qcm', question: "Conjuguez 'voir' à la 2ème personne du singulier (futur)", options: ["Tu dê bibînî", "Tu dê bibînim", "Tu dê bibîne"], answer: "Tu dê bibînî" },
+          { type: 'qcm', question: "Conjuguez 'pouvoir' à la 3ème personne du pluriel (futur)", options: ["Ewan dê bikarin", "Ewan dê bikarî", "Ewan dê bikare"], answer: "Ewan dê bikarin" },
+          { type: 'qcm', question: "Conjuguez 'devoir' à la 2ème personne du singulier (futur)", options: ["Tu dê divê", "Tu dê dive", "Tu dê divin"], answer: "Tu dê divê" }
+        ]
+      }
+    };
+
+    // Fonction de mélange
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    // Génère les questions finales avec options mélangées à chaque lancement
+    function getFullQuestions(langue, categorie) {
+      if (!rawQuestions[langue] || !rawQuestions[langue][categorie]) return [];
+      return rawQuestions[langue][categorie].map(q => {
+        if (q.type === 'qcm') {
+          return { ...q, options: shuffle([...q.options]) };
+        } else if (q.type === 'phrase') {
+          return { ...q, words: shuffle([...q.words]) };
+        }
+        return { ...q };
+      });
+    }
+
+    let selectedLang = null;
+    let selectedCat = null;
+    let currentIndex = 0;
+    let currentSet = [];
+    let score = 0;
+    let streak = 0;
+    let totalQuestions = 0;
+
+    // Sélecteurs d'écrans
+    const screenHome = document.getElementById('screen-home');
+    const screenLangue = document.getElementById('screen-langue');
+    const screenCategorie = document.getElementById('screen-categorie');
+    const screenQuiz = document.getElementById('screen-quiz');
+    const screenEnd = document.getElementById('screen-end');
+    // Boutons et zones
+    const btnBegin = document.getElementById('btn-begin');
+    const btnLangNext = document.getElementById('btn-lang-next');
+    const btnCatNext = document.getElementById('btn-cat-next');
+    const btnRestart = document.getElementById('btn-restart');
+    const categorieChoices = document.getElementById('categorie-choices');
+    const quizProgress = document.getElementById('quiz-progress');
+    // Quiz zones
+    const questionDiv = document.getElementById('quiz-question');
+    const answersDiv = document.getElementById('quiz-answers');
+    const resultDiv = document.getElementById('quiz-result');
+    const scoreBoard = document.getElementById('score-board');
+    const progressBar = document.getElementById('progress');
+    const feedbackDiv = document.getElementById('feedback');
+    const endResult = document.getElementById('end-result');
+    const soundCorrect = document.getElementById('sound-correct');
+    const soundWrong = document.getElementById('sound-wrong');
+
+    // 1. Accueil
+    btnBegin.onclick = () => {
+      screenHome.style.display = 'none';
+      screenLangue.style.display = 'block';
+    };
+
+    // 2. Choix langue
+    document.querySelectorAll('.lang-btn').forEach(btn => {
+      btn.onclick = () => {
+        document.querySelectorAll('.lang-btn').forEach(b => b.classList.remove('selected'));
+        btn.classList.add('selected');
+        selectedLang = btn.getAttribute('data-lang');
+        btnLangNext.style.display = 'block';
+      };
+    });
+    btnLangNext.onclick = () => {
+      screenLangue.style.display = 'none';
+      // Génère les catégories selon la langue (dynamique si besoin)
+      categorieChoices.innerHTML = '';
+      Object.keys(rawQuestions[selectedLang]).forEach(cat => {
+        const btn = document.createElement('button');
+        btn.className = 'cat-btn';
+        btn.textContent = cat.charAt(0).toUpperCase() + cat.slice(1);
+        btn.onclick = () => {
+          document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+          btn.classList.add('selected');
+          selectedCat = cat;
+          btnCatNext.style.display = 'block';
+        };
+        categorieChoices.appendChild(btn);
+      });
+      btnCatNext.style.display = 'none';
+      screenCategorie.style.display = 'block';
+    };
+
+    // 3. Choix catégorie
+    btnCatNext.onclick = () => {
+      screenCategorie.style.display = 'none';
+      startQuiz();
+    };
+
+    // 4. Lancement du quiz
+    function startQuiz() {
+      let allQuestions = getFullQuestions(selectedLang, selectedCat);
+      currentSet = shuffle(allQuestions).slice(0, 30);
+      totalQuestions = currentSet.length;
+      currentIndex = 0;
+      score = 0;
+      streak = 0;
+      feedbackDiv.innerHTML = '';
+      scoreBoard.innerHTML = '';
+      resultDiv.innerHTML = '';
+      progressBar.style.width = '0%';
+      quizProgress.innerHTML = '';
+      screenQuiz.style.display = 'block';
+      showQuestion();
+    }
+
+    function showQuestion() {
+      screenQuiz.style.display = 'block';
+      screenEnd.style.display = 'none';
+      const q = currentSet[currentIndex];
+      quizProgress.innerHTML = `Question ${currentIndex + 1} / ${totalQuestions}`;
+      questionDiv.textContent = q.question;
+      answersDiv.innerHTML = '';
+      resultDiv.innerHTML = '';
+      feedbackDiv.innerHTML = '';
+      progressBar.style.width = ((currentIndex) / totalQuestions * 100) + '%';
+      if (q.type === 'qcm') {
+        q.options.forEach(opt => {
+          const btn = document.createElement('div');
+          btn.className = 'option';
+          btn.textContent = opt;
+          btn.onclick = () => checkAnswer(opt, q.answer, btn);
+          answersDiv.appendChild(btn);
+        });
+      } else if (q.type === 'phrase') {
+        const wordContainer = document.createElement('div');
+        wordContainer.style.display = 'flex';
+        wordContainer.style.flexWrap = 'wrap';
+        wordContainer.style.gap = '10px';
+        const selected = [];
+        const output = document.createElement('div');
+        output.style.marginTop = '10px';
+        output.style.fontWeight = 'bold';
+        q.words.forEach(word => {
+          const btn = document.createElement('div');
+          btn.className = 'option';
+          btn.textContent = word;
+          btn.onclick = () => {
+            selected.push(word);
+            btn.style.visibility = 'hidden';
+            output.textContent = selected.join(' ');
+            if (selected.length === q.words.length) {
+              checkAnswer(selected.join(' '), q.phrase, null, wordContainer, q.words);
+            }
+          };
+          wordContainer.appendChild(btn);
+        });
+        answersDiv.appendChild(wordContainer);
+        answersDiv.appendChild(output);
+      }
+    }
+
+    function checkAnswer(selected, correct, btn=null, wordContainer=null, words=null) {
+      let isCorrect = selected.trim() === correct.trim();
+      if (isCorrect) {
+        score++;
+        streak++;
+        soundCorrect.currentTime = 0; soundCorrect.play();
+        if (btn) btn.classList.add('correct');
+        if (wordContainer) wordContainer.style.background = '#d4edda';
+        feedbackDiv.innerHTML = getRandomPositiveFeedback() + ' <span style="font-size:1.3em;">🎉</span>';
+      } else {
+        streak = 0;
+        soundWrong.currentTime = 0; soundWrong.play();
+        if (btn) btn.classList.add('incorrect');
+        if (wordContainer) wordContainer.style.background = '#f8d7da';
+        feedbackDiv.innerHTML = getRandomNegativeFeedback() + '<br><span style="color:#b00">Bonne réponse : ' + correct + '</span>';
+      }
+      Array.from(document.getElementsByClassName('option')).forEach(b => b.onclick = null);
+      setTimeout(() => {
+        currentIndex++;
+        progressBar.style.width = ((currentIndex) / totalQuestions * 100) + '%';
+        if (currentIndex < totalQuestions) {
+          showQuestion();
+        } else {
+          showResult();
+        }
+      }, 1200);
+    }
+
+    function showResult() {
+      screenQuiz.style.display = 'none';
+      screenEnd.style.display = 'block';
+      endResult.innerHTML = `<span style="font-size:1.3em;">Votre score : <b>${score} / ${totalQuestions}</b></span><br>` +
+        (score === totalQuestions ? '<span style="color:green;font-weight:bold;">Parfait ! 🏆</span>' :
+        score > totalQuestions/2 ? '<span style="color:orange;">Bien joué !</span>' :
+        '<span style="color:#b00;">Continuez à vous entraîner !</span>') +
+        `<br>Série de bonnes réponses : <b>${streak}</b>`;
+    }
+
+    function getRandomPositiveFeedback() {
+      const arr = [
+        'Bravo !', 'Super !', 'Bien joué !', 'Excellent !', 'Continue comme ça !', 'Génial !', 'Parfait !', 'Tu progresses !'
+      ];
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+    function getRandomNegativeFeedback() {
+      const arr = [
+        'Oups...', 'Essaie encore !', 'Ce n\'est pas ça.', 'Presque !', 'Tu y es presque !', 'Courage !', 'Ce sera mieux la prochaine fois.'
+      ];
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    btnRestart.onclick = () => {
+      screenEnd.style.display = 'none';
+      screenHome.style.display = 'block';
+      selectedLang = null;
+      selectedCat = null;
+    };
+  </script>
+</body>
+</html>

@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Histoire des Kurdes</title>
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="icon" type="image/png" href="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg">
+    <script>
+    // Redirection si aucune langue n'est choisie
+    if (!localStorage.getItem('kurde_site_lang')) {
+        window.location.href = 'index.html';
+    }
+    // Traduction dynamique
+    document.addEventListener('DOMContentLoaded', function() {
+      const lang = localStorage.getItem('kurde_site_lang') || 'fr';
+      if (lang !== 'fr') {
+        fetch(lang + '.json')
+          .then(res => res.json())
+          .then(trad => {
+            document.getElementById('header-title').textContent = trad.header_title;
+            document.getElementById('nav-history').textContent = trad.nav_history;
+            document.getElementById('nav-groups').textContent = trad.nav_groups;
+            document.getElementById('nav-languages').textContent = trad.nav_languages;
+            document.getElementById('nav-learn').textContent = trad.nav_learn;
+            document.getElementById('nav-quiz').textContent = trad.nav_quiz;
+            document.getElementById('nav-about').textContent = trad.nav_about;
+            document.getElementById('page-title').textContent = trad.page_title;
+            // Ajoute ici d'autres éléments à traduire si besoin
+          });
+      }
+    });
+    </script>
+</head>
+<body>
+    <header style="background:#b8001c;">
+        <h1 id="header-title"><img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau kurde" style="height:40px;vertical-align:middle;margin-right:10px;">Les Kurdes : Histoire, Culture et Langues</h1>
+        <nav>
+            <a id="nav-history" href="index.html" class="active">Histoire</a>
+            <a id="nav-groups" href="groupes.html">Groupes Kurdes</a>
+            <a id="nav-languages" href="langues.html">Langues</a>
+            <a id="nav-learn" href="apprendre.html">Apprendre</a>
+            <a id="nav-quiz" href="quiz.html">Quiz</a>
+            <a id="nav-about" href="a-propos.html">À propos de moi</a>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Histoire chronologique des Kurdes</h2>
+            <p>Découvrez l'histoire des Kurdes, peuple millénaire du Moyen-Orient, à travers une chronologie claire, pédagogique et illustrée, des origines à nos jours.</p>
+
+            <h3>1. Préhistoire et protohistoire</h3>
+            <p>Les montagnes du Zagros, au cœur du Kurdistan actuel, sont habitées depuis le paléolithique. Les premières communautés agricoles du Néolithique y voient le jour (sites de Shanidar, Jarmo). Dès le III<sup>e</sup> millénaire av. J.-C., des peuples montagnards comme les <b>Guti</b> et les <b>Lullubi</b> apparaissent dans les textes sumériens et akkadiens. Ils résistent aux empires mésopotamiens et sont réputés pour leur bravoure.</p>
+            <div style="background:#f1f7fa;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>À savoir&nbsp;:</b> Les Guti sont mentionnés comme ayant brièvement dominé la Mésopotamie après la chute de l'empire d'Akkad (vers 2150 av. J.-C.).
+            </div>
+
+            <h3>2. Antiquité&nbsp;: Mèdes, Cardouques, Cyrtii</h3>
+            <p>Au Ier millénaire av. J.-C., les <b>Mèdes</b> (peuple indo-iranien) fondent un empire puissant centré sur Ecbatane (Hamadan). Les Kurdes revendiquent souvent une filiation avec les Mèdes. D'autres peuples, comme les <b>Cardouques</b> (Kardouchoi) et les <b>Cyrtii</b>, sont cités par Xénophon et Strabon comme des ancêtres des Kurdes. La région est successivement dominée par les Assyriens, les Perses achéménides, les Grecs d'Alexandre, les Parthes et les Sassanides.</p>
+            <table style="width:100%;margin:16px 0;background:#fff9e6;border-radius:8px;">
+                <tr><th>Période</th><th>Événement marquant</th></tr>
+                <tr><td>~2150 av. J.-C.</td><td>Règne des Guti sur la Mésopotamie</td></tr>
+                <tr><td>VII<sup>e</sup> s. av. J.-C.</td><td>Empire mède&nbsp;: apogée politique et culturel</td></tr>
+                <tr><td>401 av. J.-C.</td><td>Expédition des Dix Mille (Xénophon) à travers les terres des Cardouques</td></tr>
+                <tr><td>III<sup>e</sup> s. av. J.-C. - VII<sup>e</sup> s. ap. J.-C.</td><td>Domination parthe puis sassanide</td></tr>
+            </table>
+            <div style="background:#fff9e6;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Anecdote&nbsp;:</b> Xénophon raconte que les Cardouques étaient si redoutés que les Dix Mille, armée grecque en retraite, durent traverser leurs montagnes en secret pour éviter l'affrontement.
+            </div>
+            <p>Avec la conquête arabe au VII<sup>e</sup> siècle, les Kurdes se convertissent progressivement à l'islam, tout en conservant des traditions préislamiques (yézidisme, zoroastrisme).</p>
+
+            <h3>3. Symbolique ancestrale et Newroz</h3>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:30px;margin-bottom:20px;">
+                <img src="images/Nowruz-montagne.webp" alt="Feu de Newroz" style="max-width:120px;border-radius:10px;">
+                <div style="flex:1;min-width:220px;">
+                    <p><b>Newroz</b> (21 mars) est la fête du Nouvel An kurde, célébrée depuis l'Antiquité. Elle symbolise la résistance, la renaissance et l'attachement à la liberté. Les Kurdes allument des feux, dansent et chantent pour marquer la victoire de Kawa le forgeron sur le tyran Zahak, mythe fondateur de l'identité kurde.</p>
+                </div>
+            </div>
+            <div style="background:#fff9e6;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Mythe fondateur&nbsp;: Kawa le forgeron</b><br>Selon la légende, Kawa mena le soulèvement contre le tyran Zahak, libérant le peuple et allumant le feu de la liberté, origine de la fête de Newroz. Ce mythe incarne la lutte contre l'oppression et l'espoir d'un renouveau.
+            </div>
+            <div style="background:#f1f7fa;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Transmission&nbsp;:</b> Newroz est aujourd'hui un moment central de la culture kurde, célébré dans la diaspora, et porteur d'un message universel de liberté et de solidarité.
+            </div>
+
+            <h3>4. Moyen Âge&nbsp;: dynasties kurdes et rayonnement</h3>
+            <p>Entre le Xe et le XIIIe siècle, les Kurdes fondent plusieurs dynasties et principautés autonomes&nbsp;: <b>Shaddadides</b> (Caucase), <b>Marwanides</b> (Diyarbakir), <b>Hasanwayhides</b> (Zagros), <b>Annazides</b> (Kermanshah), <b>Ayyoubides</b> (fondée par Saladin). Saladin (Salah ad-Din), né à Tikrit, devient sultan d'Égypte et de Syrie, et libère Jérusalem en 1187. Les Kurdes participent aux Croisades, servent comme soldats, administrateurs, parfois rebelles.</p>
+            <img src="images/fee3a0dc69897cb380a14cff44e3ccd4.webp" alt="Statue de Saladin à Damas" style="max-width:200px;float:right;margin:0 0 18px 18px;border-radius:10px;">
+            <ul>
+                <li><b>Organisation sociale&nbsp;:</b> Tribalisme, chefferies, confréries religieuses (soufisme, yézidisme, alévisme), place des femmes dans certaines tribus.</li>
+                <li><b>Culture&nbsp;:</b> Littérature orale, poésie, épopées (Mem û Zîn), bardes (dengbêj), premiers textes écrits en kurde.</li>
+            </ul>
+            <div style="background:#f1f7fa;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Focus&nbsp;: Saladin</b><br>Saladin (1137-1193) incarne l'idéal du souverain juste et tolérant, admiré en Orient comme en Occident.
+            </div>
+            <div style="clear:both"></div>
+
+            <h3>5. Époque ottomane et perse (XVIe-XIXe siècles)</h3>
+            <p>Le Kurdistan est partagé entre l'Empire ottoman et la Perse safavide. Les Kurdes bénéficient parfois d'une large autonomie grâce au système des <b>beyliks</b> (principautés héréditaires). Les grandes familles kurdes (Barzani, Baban, Soran, Jaf, etc.) négocient leur autonomie contre des services militaires ou administratifs. Mais la centralisation progressive des empires réduit leur pouvoir.</p>
+            <ul>
+                <li><b>Révoltes notables&nbsp;:</b> Révolte de Bedir Khan Beg (1847), soulèvements contre la centralisation ottomane, alliances et rivalités entre familles kurdes.</li>
+                <li><b>Relations avec les autres minorités&nbsp;:</b> Coexistence, parfois tensions, avec Arméniens, Assyriens, Arabes, Perses, Turcs.</li>
+            </ul>
+            <div style="background:#fff9e6;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Anecdote&nbsp;:</b> Certains beyliks kurdes ont résisté à la centralisation jusqu'au XIX<sup>e</sup> siècle.
+            </div>
+
+            <h3>6. XXe siècle&nbsp;: partages, révoltes, tragédies</h3>
+            <p>Après la Première Guerre mondiale, le traité de Sèvres (1920) prévoyait un État kurde, mais il fut annulé par le traité de Lausanne (1923) sous la pression de la Turquie kémaliste. Les Kurdes sont alors divisés entre quatre États-nations. S'ensuivent de nombreuses révoltes et tragédies&nbsp;:</p>
+            <ul>
+                <li><b>Turquie&nbsp;:</b> Révoltes de Sheikh Said (1925), d'Ararat (1930), massacre de Dersim (1937-38), politique d'assimilation, interdiction de la langue kurde, exils massifs.</li>
+                <li><b>Irak&nbsp;:</b> République de Mahabad (1946, éphémère), répressions, génocide d'Halabja (1988), exodes, guerres contre le pouvoir central, rôle des Peshmergas.</li>
+                <li><b>Iran&nbsp;:</b> Révoltes, exécutions, marginalisation politique, résistance culturelle.</li>
+                <li><b>Syrie&nbsp;:</b> Discriminations, privation de nationalité, émergence du Rojava (2012), expériences d'autonomie démocratique.</li>
+            </ul>
+            <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau du Kurdistan" style="max-width:180px;display:block;margin:20px auto;">
+            <table style="width:100%;margin:16px 0;background:#f1f7fa;border-radius:8px;">
+                <tr><th>Année</th><th>Événement</th></tr>
+                <tr><td>1920</td><td>Traité de Sèvres (État kurde prévu)</td></tr>
+                <tr><td>1923</td><td>Traité de Lausanne (partage du Kurdistan)</td></tr>
+                <tr><td>1946</td><td>République de Mahabad (Iran)</td></tr>
+                <tr><td>1988</td><td>Génocide d'Halabja (Irak)</td></tr>
+                <tr><td>1991</td><td>Autonomie du Kurdistan irakien</td></tr>
+                <tr><td>2012</td><td>Naissance du Rojava (Syrie)</td></tr>
+            </table>
+            <div style="background:#fff9e6;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Focus&nbsp;: La République de Mahabad</b><br>En 1946, les Kurdes d'Iran proclament la République de Mahabad, premier État kurde moderne, soutenu par l'URSS. Elle ne dure que quelques mois, mais reste un symbole fort de la lutte pour l'autodétermination.
+            </div>
+            <div style="background:#f1f7fa;padding:14px 18px;border-radius:10px;margin:24px 0;">
+                <b>Le Traité de Lausanne (1923)</b><br>
+                Le <b>Traité de Lausanne</b>, signé le 24 juillet 1923, marque la fin de l'Empire ottoman et fixe les frontières de la Turquie moderne. Il annule les dispositions du Traité de Sèvres qui prévoyaient un État kurde indépendant. Les Kurdes se retrouvent ainsi divisés entre la Turquie, l'Irak, l'Iran et la Syrie, sans reconnaissance de leurs droits nationaux. Ce traité est considéré comme un tournant majeur dans l'histoire kurde, à l'origine de nombreuses révoltes et d'un siècle de luttes pour la reconnaissance.
+            </div>
+
+            <h3>7. XXe-XXIe siècles et enjeux contemporains</h3>
+            <ul>
+                <li><b>Turquie&nbsp;:</b> Les Kurdes représentent 15 à 20&nbsp;% de la population. Ils font face à des discriminations, mais disposent d'une vie politique et culturelle plus active depuis les années 2000, malgré la répression. Le conflit avec l'État turc, incarné par le PKK, reste un enjeu majeur.</li>
+                <li><b>Irak&nbsp;:</b> Le Gouvernement régional du Kurdistan (GRK) jouit d'une large autonomie, d'institutions propres, d'une armée (Peshmergas) et d'une vie culturelle dynamique. Les enjeux pétroliers et géopolitiques sont centraux.</li>
+                <li><b>Syrie&nbsp;:</b> Le Rojava est une expérience d'autonomie démocratique, fondée sur l'égalité des genres, l'écologie et la coexistence des peuples. Les Kurdes syriens ont joué un rôle clé dans la lutte contre Daech.</li>
+                <li><b>Iran&nbsp;:</b> Les Kurdes subissent une forte répression, mais maintiennent une identité vivace, notamment à travers la culture et la résistance pacifique.</li>
+                <li><b>La diaspora&nbsp;:</b> Plusieurs millions de Kurdes vivent en Europe, notamment en Allemagne, France, Suède, où ils jouent un rôle important dans la préservation de la culture et la défense des droits humains.</li>
+            </ul>
+            <div style="background:#f1f7fa;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Figures historiques kurdes&nbsp;:</b> Saladin (Salah ad-Din), Mustafa Barzani, Jalal Talabani, Leyla Zana, Abdullah Öcalan, Sakine Cansiz, Mahabad Qazi, Ehmedê Xanî, etc. Chacun a marqué l'histoire kurde par son engagement, sa pensée ou son combat.
+            </div>
+
+            <h3>8. Symboles, drapeaux et mémoire collective</h3>
+            <div style="display:flex;flex-wrap:wrap;align-items:center;gap:30px;margin-bottom:20px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau du Kurdistan" style="max-width:120px;border-radius:10px;">
+                <div style="flex:1;min-width:220px;">
+                    <p>Le drapeau du Kurdistan, adopté en 1946, est composé de trois bandes horizontales (rouge, blanc, vert) et d'un soleil doré à 21 rayons. <b>Rouge</b>&nbsp;: le sang des martyrs, <b>blanc</b>&nbsp;: la paix, <b>vert</b>&nbsp;: la nature et l'espoir, <b>soleil</b>&nbsp;: la lumière et la renaissance. Il symbolise l'unité et l'aspiration à la liberté.</p>
+                </div>
+            </div>
+            <div style="background:#fff9e6;padding:12px 16px;border-radius:10px;margin:16px 0;">
+                <b>Transmission culturelle&nbsp;:</b> La mémoire kurde se transmet par la langue, la poésie, la musique, les fêtes, les récits de résistance et les symboles partagés.
+            </div>
+        </section>
+    </main>
+    <footer style="background:#b8001c; color:white;">
+        <p>2025 - Tous droits réservés</p>
+    </footer>
+    <script src="assets/js/chatbot.js"></script>
+</body>
+</html> 
