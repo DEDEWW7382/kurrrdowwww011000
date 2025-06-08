@@ -81,6 +81,27 @@
   .big-btn, .lang-btn, .cat-btn { width: 100%; min-width: 0; }
   #categorie-choices { flex-direction: column; align-items: center; }
 }
+
+.option {
+  position: relative;
+}
+
+.option span {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 </style>
 <audio id="sound-correct" src="https://cdn.pixabay.com/audio/2021/08/04/audio_62bfe452a0.mp3"></audio>
 <audio id="sound-wrong" src="https://cdn.pixabay.com/audio/2022/03/24/audio_3bfb3cb0aa.mp3"></audio>
@@ -92,11 +113,35 @@
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+.option {
+  position: relative;
+}
+
+.option span {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  background: #dc3545;
+  color: #fff;
+  border-radius: 50%;
+  width: 18px;
+  height: 18px;
+  text-align: center;
+  line-height: 18px;
+  font-size: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
 </style>
 </head>
 <body>
   <header style="background:#b8001c;">
-    <h1><img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau kurde" style="height:40px;vertical-align:middle;margin-right:10px;">Les Kurdes : Histoire, Culture et Langues</h1>
+    <h1 id="header-title"><img src="https://upload.wikimedia.org/wikipedia/commons/3/35/Flag_of_Kurdistan.svg" alt="Drapeau kurde" style="height:40px;vertical-align:middle;margin-right:10px;">Les Kurdes : Histoire, Culture et Langues</h1>
+    <a href="https://discord.gg/S5pUxAAjJq" target="_blank" style="position:absolute;top:20px;right:20px;background:#5865F2;padding:8px;border-radius:8px;display:flex;align-items:center;transition:background 0.3s;">
+        <img src="assets/images/discord.jfif" alt="Discord" style="height:32px;width:32px;">
+    </a>
     <nav>
       <a id="nav-history" href="index.html">Histoire</a>
       <a href="groupes.html">Groupes Kurdes</a>
@@ -156,6 +201,13 @@
     const rawQuestions = {
       kurmanji: {
         vocabulaire: [
+{
+  type: 'audio',
+  question: "Écoutez et choisissez la bonne phrase",
+  audio: "Ez nanê dixwim",
+  options: ["Ez nanê dixwim", "Tu çay vedixwî", "Em li Amedê dijîn"],
+  answer: "Ez nanê dixwim"
+},
           { type: 'qcm', question: "Comment dit-on 'pomme' ?", options: ["Sêv", "Kitêb", "Çay"], answer: "Sêv" },
           { type: 'qcm', question: "Que signifie 'mal' ?", options: ["Maison", "Chien", "Livre"], answer: "Maison" },
           { type: 'qcm', question: "Comment dit-on 'eau' ?", options: ["Av", "Nan", "Çay"], answer: "Av" },
@@ -364,7 +416,20 @@
         if (q.type === 'qcm') {
           return { ...q, options: shuffle([...q.options]) };
         } else if (q.type === 'phrase') {
-          return { ...q, words: shuffle([...q.words]) };
+          return { ...q, words: shuffle([...q.words]) }
+  } else if (q.type === 'audio') {
+    const utterance = new SpeechSynthesisUtterance(q.audio);
+    utterance.lang = 'ku-KU';
+    speechSynthesis.speak(utterance);
+
+    q.options.forEach(opt => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(opt, q.answer, btn);
+      answersDiv.appendChild(btn);
+    });
+;
         }
         return { ...q };
       });
@@ -461,52 +526,122 @@
     }
 
     function showQuestion() {
-      screenQuiz.style.display = 'block';
-      screenEnd.style.display = 'none';
-      const q = currentSet[currentIndex];
-      quizProgress.innerHTML = `Question ${currentIndex + 1} / ${totalQuestions}`;
-      questionDiv.textContent = q.question;
-      answersDiv.innerHTML = '';
-      resultDiv.innerHTML = '';
-      feedbackDiv.innerHTML = '';
-      progressBar.style.width = ((currentIndex) / totalQuestions * 100) + '%';
-      if (q.type === 'qcm') {
-        q.options.forEach(opt => {
-          const btn = document.createElement('div');
-          btn.className = 'option';
-          btn.textContent = opt;
-          btn.onclick = () => checkAnswer(opt, q.answer, btn);
-          answersDiv.appendChild(btn);
-        });
-      } else if (q.type === 'phrase') {
-        const wordContainer = document.createElement('div');
-        wordContainer.style.display = 'flex';
-        wordContainer.style.flexWrap = 'wrap';
-        wordContainer.style.gap = '10px';
-        const selected = [];
-        const output = document.createElement('div');
-        output.style.marginTop = '10px';
-        output.style.fontWeight = 'bold';
-        q.words.forEach(word => {
-          const btn = document.createElement('div');
-          btn.className = 'option';
-          btn.textContent = word;
-          btn.onclick = () => {
-            selected.push(word);
-            btn.style.visibility = 'hidden';
-            output.textContent = selected.join(' ');
-            if (selected.length === q.words.length) {
-              checkAnswer(selected.join(' '), q.phrase, null, wordContainer, q.words);
-            }
-          };
-          wordContainer.appendChild(btn);
-        });
-        answersDiv.appendChild(wordContainer);
-        answersDiv.appendChild(output);
-      }
+  screenQuiz.style.display = 'block';
+  screenEnd.style.display = 'none';
+  const q = currentSet[currentIndex];
+  quizProgress.innerHTML = `Question ${currentIndex + 1} / ${totalQuestions}`;
+  questionDiv.textContent = q.question;
+  answersDiv.innerHTML = '';
+  resultDiv.innerHTML = '';
+  feedbackDiv.innerHTML = '';
+  progressBar.style.width = ((currentIndex) / totalQuestions * 100) + '%';
+
+  if (q.type === 'qcm') {
+    q.options.forEach(opt => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(opt, q.answer, btn);
+      answersDiv.appendChild(btn);
+    });
+
+  } else if (q.type === 'phrase') {
+    const wordContainer = document.createElement('div');
+    wordContainer.style.display = 'flex';
+    wordContainer.style.flexWrap = 'wrap';
+    wordContainer.style.gap = '10px';
+
+    const selectedContainer = document.createElement('div');
+    selectedContainer.style.marginTop = '10px';
+    selectedContainer.style.display = 'flex';
+    selectedContainer.style.flexWrap = 'wrap';
+    selectedContainer.style.gap = '10px';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = 'Confirmer';
+    confirmBtn.className = 'big-btn';
+    confirmBtn.style.marginTop = '15px';
+    confirmBtn.style.display = 'none';
+
+    let selectedWords = [];
+
+    function updateSelectedDisplay() {
+      selectedContainer.innerHTML = '';
+      selectedWords.forEach((word, idx) => {
+        const wordBox = document.createElement('div');
+        wordBox.className = 'option';
+        wordBox.style.position = 'relative';
+
+        const close = document.createElement('span');
+        close.innerHTML = '&times;';
+        close.style.position = 'absolute';
+        close.style.top = '-8px';
+        close.style.right = '-8px';
+        close.style.background = '#dc3545';
+        close.style.color = '#fff';
+        close.style.borderRadius = '50%';
+        close.style.width = '18px';
+        close.style.height = '18px';
+        close.style.textAlign = 'center';
+        close.style.lineHeight = '18px';
+        close.style.fontSize = '12px';
+        close.style.cursor = 'pointer';
+        close.title = 'Supprimer ce mot';
+        close.onclick = () => {
+          selectedWords.splice(idx, 1);
+          unusedButtons[word].style.visibility = 'visible';
+          updateSelectedDisplay();
+        }
+  } else if (q.type === 'audio') {
+    const utterance = new SpeechSynthesisUtterance(q.audio);
+    utterance.lang = 'ku-KU';
+    speechSynthesis.speak(utterance);
+
+    q.options.forEach(opt => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = opt;
+      btn.onclick = () => checkAnswer(opt, q.answer, btn);
+      answersDiv.appendChild(btn);
+    });
+;
+
+        wordBox.textContent = word;
+        wordBox.appendChild(close);
+        selectedContainer.appendChild(wordBox);
+      });
+
+      confirmBtn.style.display = (selectedWords.length === q.words.length) ? 'block' : 'none';
     }
 
-    function checkAnswer(selected, correct, btn=null, wordContainer=null, words=null) {
+    const unusedButtons = {};
+
+    q.words.forEach(word => {
+      const btn = document.createElement('div');
+      btn.className = 'option';
+      btn.textContent = word;
+      btn.onclick = () => {
+        if (selectedWords.length < q.words.length) {
+          selectedWords.push(word);
+          btn.style.visibility = 'hidden';
+          updateSelectedDisplay();
+        }
+      };
+      unusedButtons[word] = btn;
+      wordContainer.appendChild(btn);
+    });
+
+    confirmBtn.onclick = () => {
+      checkAnswer(selectedWords.join(' '), q.phrase, null, wordContainer, q.words);
+    };
+
+    answersDiv.appendChild(wordContainer);
+    answersDiv.appendChild(selectedContainer);
+    answersDiv.appendChild(confirmBtn);
+  }
+}
+
+function checkAnswer(selected, correct, btn=null, wordContainer=null, words=null) {
       let isCorrect = selected.trim() === correct.trim();
       if (isCorrect) {
         score++;
@@ -531,7 +666,7 @@
         } else {
           showResult();
         }
-      }, 1200);
+      }, 5000);
     }
 
     function showResult() {
